@@ -64,7 +64,6 @@
       const querySnapshot = await getDocs(collection(db, "home"));
       querySnapshot.forEach((doc) => {
         console.log(doc.data());
-        App(doc)
       });
       // console.log(querySnapshot.docs)
 

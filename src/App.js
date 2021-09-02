@@ -12,7 +12,10 @@ import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
 
-
+const querySnapshot = await getDocs(collection(db, "home"));
+  querySnapshot.forEach((doc) => {
+    console.log(doc.data());
+});
 
 function App() {
   let colors = ['','Red','Yellow','Green','Blue','Orange','Purple','Pink']
