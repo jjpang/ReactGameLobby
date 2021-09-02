@@ -8,16 +8,19 @@
 
 import React, { useState } from 'react';
 import './App.css';
-import Button from '@material-ui/core/Button';
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
+
 
 
 function App() {
   let colors = ['','Red','Yellow','Green','Blue','Orange','Purple','Pink']
   const [colorsUsed, setColorsUsed] = useState({color1: '',color2: '',color3: '',color4: ''})
   const [colorsLeft, setColorsLeft] = useState(colors)
+
+
+  
 
   const CreateBox = ({title, colorNum}) => {    
     let colorsUsedNow = colorsUsed
@@ -55,7 +58,7 @@ function App() {
     <main>
       <p className="title">Game Lobby</p>
       <Container maxWidth="md">
-        <Grid container spacing={5} justify="center">
+        <Grid container spacing={5} justifyContent="center">
           <CreateBox title = 'P1' colorNum = 'color1' />
           <CreateBox title = 'P2' colorNum = 'color2' />
           <CreateBox title = 'P3' colorNum = 'color3' />
