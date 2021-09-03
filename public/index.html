@@ -38,8 +38,11 @@
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <script type="module">
       // Import the functions you need from the SDKs you need
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.1/firebase-app.js";
-      import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.0.1/firebase-firestore.js";
+      import { initializeApp } from "firebase/app";
+      import { getFirestore, collection, getDocs } from "firebase/firestore/lite";
+      
+      // import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.1/firebase-app.js";
+      // import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.0.1/firebase-firestore.js";
       // import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.0.1/firebase-analytics.js";
       // TODO: Add SDKs for Firebase products that you want to use
       // https://firebase.google.com/docs/web/setup#available-libraries
@@ -57,14 +60,8 @@
       };
     
       // Initialize Firebase
-      const app = initializeApp(firebaseConfig);
-      const db = getFirestore();
-      // const analytics = getAnalytics(app);
-
-      const querySnapshot = await getDocs(collection(db, "home"));
-      querySnapshot.forEach((doc) => {
-        console.log(doc.data());
-      });
+      
+      
       // console.log(querySnapshot.docs)
 
       // db.collection('home').get().then((snapshot) => {
