@@ -95,7 +95,7 @@ function App() {
 export default App;
 
 /*
-- Currently stock on the error in row 42
+- Currently stock on the error in row 34
 
 - when do i use useState if i have a backend?
 - NPM vs. CDN...what should I do in the future?
