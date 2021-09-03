@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore, collection, getDocs } from "firebase/firestore/lite";
+import { getFirestore, collection, getDocs, doc, updateDoc } from "firebase/firestore/lite";
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import Container from '@material-ui/core/Container';
@@ -7,42 +7,55 @@ import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
 
 function App() {
-  
   const colors = ['','Red','Yellow','Green','Blue','Orange','Purple','Pink']
   const [colorsUsed, setColorsUsed] = useState({color1: '',color2: '',color3: '',color4: ''})
-
+  const [colorsLeft, setColorsLeft] = useState(colors)
   let colorsUsedNow = colorsUsed
-  let colorsLeft = colors
-
+  let colorsLeftNow = colorsLeft
+  const firebaseConfig = {
+    apiKey: "AIzaSyBFoiib7l-0u0X6WzpFxzleMqsKzTqopy0",
+    authDomain: "reactgamelobby.firebaseapp.com",
+    projectId: "reactgamelobby",
+    storageBucket: "reactgamelobby.appspot.com",
+    messagingSenderId: "641413523836",
+    appId: "1:641413523836:web:3d9424b6b039aa20d81cf9",
+    measurementId: "G-7FR5CSRH8D"
+  };
+  const app = initializeApp(firebaseConfig);
+  let db = getFirestore();
   const fetchData=async()=>{
-    const firebaseConfig = {
-      apiKey: "AIzaSyBFoiib7l-0u0X6WzpFxzleMqsKzTqopy0",
-      authDomain: "reactgamelobby.firebaseapp.com",
-      projectId: "reactgamelobby",
-      storageBucket: "reactgamelobby.appspot.com",
-      messagingSenderId: "641413523836",
-      appId: "1:641413523836:web:3d9424b6b039aa20d81cf9",
-      measurementId: "G-7FR5CSRH8D"
-    };
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore();
     let querySnapshot = await getDocs(collection(db, "home"));
+    // reads and sets colorsUsed
     querySnapshot.forEach((doc) => {
-      // console.log(doc.data());
-      colorsUsedNow[doc.data().colorNum] = doc.data().color
+      colorsUsedNow[doc.id] = doc.data().color
       setColorsUsed(colorsUsedNow)
     });
     // determines colorsLeft based on colorsUsed
-    let colorsUsedPrev = Object.values(colorsUsed)
-    colorsLeft = colorsLeft.filter((colorLeft)=>{
-      return !colorsUsedPrev.includes(colorLeft)
+    colorsUsedNow = Object.values(colorsUsed)
+    colorsLeftNow = colorsLeft.filter((colorLeft)=>{
+      return !colorsUsedNow.includes(colorLeft)
     })
+    setColorsLeft(colorsLeftNow)
   }
-
+  const saveData = async() => {
+    console.log('test')
+    let colorNums = Object.keys(colorsUsed)
+    for (let n = 0; n < colorNums.length; n++) {
+      let playerColor = doc(db, "home", colorNums[n]);
+      await updateDoc(playerColor, {
+        color: colorsUsed[colorNums[n]]
+      })
+    }
+  }
+  window.addEventListener('beforeunload', saveData)
   useEffect(() => {
     fetchData()
-  },[colorsUsed]) // only called upon mount, read about lifecycle hooks.
-
+  },[])
+  
+  useEffect(() => {
+    saveData()
+  },[colorsUsedNow])// only called upon mount, read about lifecycle hooks.
+  // updates colorsUsed in firestore
   const CreateBox = ({title, colorNum}) => {        
     return (
       <Grid item xs={5}>
@@ -51,14 +64,16 @@ function App() {
             <Box display="inline-block" p={1} bgcolor="white" mt={11}>
               <label>Choose Color: </label>
               <select onChange={(e)=>{
-                // remove new color from colorsLeft
-                colorsLeft = colorsLeft.filter((color) => color!==e.target.value)
+                // remove new color from colorsLeftNow
+                colorsLeftNow = colorsLeftNow.filter((color) => color!==e.target.value)
                 // if last color exists, add to colorsLeft
-                if (colorsUsedNow[colorNum]) { colorsLeft = [colorsUsedNow[colorNum], ...colorsLeft] }
+                if (colorsUsedNow[colorNum]) { colorsLeftNow = [colorsUsedNow[colorNum], ...colorsLeftNow] }
                 // adds newly selected color to colorUsed
                 colorsUsedNow[colorNum] = e.target.value
                 setColorsUsed(colorsUsedNow)
-                }}>
+                setColorsLeft(colorsLeftNow)
+                
+              }}>
                 <option value="" disabled selected hidden>{colorsUsed[colorNum]}</option>  
                 {colorsLeft.map(color=>{
                   return <option 
@@ -88,9 +103,7 @@ function App() {
 }
 
 export default App;
-
 /*
-
 Persistent storage:
 - reload the grid when Firestore loads
 
