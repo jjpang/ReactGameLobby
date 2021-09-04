@@ -23,6 +23,7 @@ function App() {
   };
   const app = initializeApp(firebaseConfig);
   let db = getFirestore();
+  
   const fetchData=async()=>{
     let querySnapshot = await getDocs(collection(db, "home"));
     // reads and sets colorsUsed
@@ -37,6 +38,7 @@ function App() {
     })
     setColorsLeft(colorsLeftNow)
   }
+  
   const saveData = async() => {
     console.log('test')
     let colorNums = Object.keys(colorsUsed)
@@ -48,13 +50,14 @@ function App() {
     }
   }
   window.addEventListener('beforeunload', saveData)
+  
   useEffect(() => {
     fetchData()
-  },[])
+  },[]) // if empty only runs when component is mounted, which could happen with props changing
   
   useEffect(() => {
     saveData()
-  },[colorsUsedNow])// only called upon mount, read about lifecycle hooks.
+  },[colorsUsedNow, colorsLeftNow])// only called upon mount, read about lifecycle hooks.
   // updates colorsUsed in firestore
   const CreateBox = ({title, colorNum}) => {        
     return (
