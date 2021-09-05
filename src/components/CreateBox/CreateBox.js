@@ -10,27 +10,22 @@ const CreateBox = ({title, colorNum, colorsUsed, setColorsUsed, colorsUsedNow, c
             <Box display="inline-block" p={1} bgcolor="white" mt={11}>
               <label>Choose Color: </label>
               <select onChange={(e)=>{
-                
                 // remove new color from colorsLeftNow
                 colorsLeftNow = colorsLeftNow.filter((color) => color!==e.target.value)
                 // if last color exists, add to colorsLeftNow
                 if (colorsUsedNow[colorNum]) { colorsLeftNow = [colorsUsedNow[colorNum], ...colorsLeftNow] }
-                
                 // adds newly selected color to colorUsed
                 colorsUsedNow[colorNum] = e.target.value
                 setColorsUsed(colorsUsedNow)
                 setColorsLeft(colorsLeftNow)
-                console.log(colorsUsedNow[colorNum])
-                
               }}
-                defaultValue={colorsUsed[colorNum]}
               >
-                <option value="" disabled hidden>{colorsUsedNow[colorNum]}</option> 
+                <option value="" disabled selected hidden>text</option> 
                 {colorsLeft.map(color=>{
-                return <option 
-                    key={color} 
-                    value={color}>
-                    {color}</option>
+                    return <option 
+                        key={color} 
+                        value={color}>
+                        {color}</option>
                 })}
               </select>
             </Box>
@@ -40,3 +35,5 @@ const CreateBox = ({title, colorNum, colorsUsed, setColorsUsed, colorsUsedNow, c
   }
 
   export default CreateBox;
+
+  
