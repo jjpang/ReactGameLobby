@@ -1,10 +1,10 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore, collection, getDocs, doc, updateDoc } from "firebase/firestore/lite";
+import { getFirestore, collection, getDoc, doc, updateDoc, setDoc } from "firebase/firestore/lite";
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
-import Box from '@material-ui/core/Box';
+import CreateBox from './components/CreateBox/CreateBox'
 
 function App() {
   const colors = ['','Red','Yellow','Green','Blue','Orange','Purple','Pink']
@@ -25,31 +25,29 @@ function App() {
   let db = getFirestore();
   
   const fetchData=async()=>{
-    let querySnapshot = await getDocs(collection(db, "home"));
+    console.log('fetch data')
+    let docSnap = await getDoc(doc(db, "home", "colorsUsed"));
     // reads and sets colorsUsed
-    querySnapshot.forEach((doc) => {
-      colorsUsedNow[doc.id] = doc.data().color
-      setColorsUsed(colorsUsedNow)
-    });
+    setColorsUsed(docSnap.data())
     // determines colorsLeft based on colorsUsed
-    colorsUsedNow = Object.values(colorsUsed)
-    colorsLeftNow = colorsLeft.filter((colorLeft)=>{
-      return !colorsUsedNow.includes(colorLeft)
+    colorsUsedNow = Object.values(docSnap.data())
+    colorsLeftNow = colors.filter((color)=>{
+      return !colorsUsedNow.includes(color)
     })
     setColorsLeft(colorsLeftNow)
   }
   
   const saveData = async() => {
-    console.log('test')
-    let colorNums = Object.keys(colorsUsed)
-    for (let n = 0; n < colorNums.length; n++) {
-      let playerColor = doc(db, "home", colorNums[n]);
-      await updateDoc(playerColor, {
-        color: colorsUsed[colorNums[n]]
-      })
-    }
+    await setDoc(doc(db, "home", "colorsUsed"), colorsUsed);
+    // let colorNums = Object.keys(colorsUsed)
+    // for (let n = 0; n < colorNums.length; n++) {
+    //   let playerColor = doc(db, "home", colorNums[n]);
+    //   await updateDoc(playerColor, {
+    //     color: colorsUsed[colorNums[n]]
+    //   })
+    // }
   }
-  window.addEventListener('beforeunload', saveData)
+  // window.addEventListener('beforeunload', saveData)
   
   useEffect(() => {
     fetchData()
@@ -59,46 +57,16 @@ function App() {
     saveData()
   },[colorsUsedNow, colorsLeftNow])// only called upon mount, read about lifecycle hooks.
   // updates colorsUsed in firestore
-  const CreateBox = ({title, colorNum}) => {        
-    return (
-      <Grid item xs={5}>
-        <Box fontSize={24} textAlign="center" height={28} border={3} p={1}>{title}</Box>
-          <Box textAlign="center" height={240} borderLeft={3} borderRight={3} borderBottom={3} pt={1.5}style={{backgroundColor: colorsUsed[colorNum]}}>
-            <Box display="inline-block" p={1} bgcolor="white" mt={11}>
-              <label>Choose Color: </label>
-              <select onChange={(e)=>{
-                // remove new color from colorsLeftNow
-                colorsLeftNow = colorsLeftNow.filter((color) => color!==e.target.value)
-                // if last color exists, add to colorsLeft
-                if (colorsUsedNow[colorNum]) { colorsLeftNow = [colorsUsedNow[colorNum], ...colorsLeftNow] }
-                // adds newly selected color to colorUsed
-                colorsUsedNow[colorNum] = e.target.value
-                setColorsUsed(colorsUsedNow)
-                setColorsLeft(colorsLeftNow)
-                
-              }}>
-                <option value="" disabled selected hidden>{colorsUsed[colorNum]}</option>  
-                {colorsLeft.map(color=>{
-                  return <option 
-                    key={color} 
-                    value={color}>
-                    {color}</option>
-                })}
-              </select>
-            </Box>
-        </Box>
-      </Grid>
-    )
-  }
+  
   return (
     <main>
       <p className="title">Game Lobby</p>
       <Container maxWidth="md" id="grid">
         <Grid container spacing={5} justifyContent="center">
-          <CreateBox title = 'P1' colorNum = 'color1' />
-          <CreateBox title = 'P2' colorNum = 'color2' />
-          <CreateBox title = 'P3' colorNum = 'color3' />
-          <CreateBox title = 'P4' colorNum = 'color4' />
+          <CreateBox title = 'P1' colorNum = 'color1' colorsUsed={colorsUsed} setColorsUsed={setColorsUsed} colorsUsedNow={colorsUsedNow} colorsLeft={colorsLeft} setColorsLeft={setColorsLeft} colorsLeftNow={colorsLeftNow} />
+          <CreateBox title = 'P2' colorNum = 'color2' colorsUsed={colorsUsed} setColorsUsed={setColorsUsed} colorsUsedNow={colorsUsedNow} colorsLeft={colorsLeft} setColorsLeft={setColorsLeft} colorsLeftNow={colorsLeftNow} />
+          <CreateBox title = 'P3' colorNum = 'color3' colorsUsed={colorsUsed} setColorsUsed={setColorsUsed} colorsUsedNow={colorsUsedNow} colorsLeft={colorsLeft} setColorsLeft={setColorsLeft} colorsLeftNow={colorsLeftNow} />
+          <CreateBox title = 'P4' colorNum = 'color4' colorsUsed={colorsUsed} setColorsUsed={setColorsUsed} colorsUsedNow={colorsUsedNow} colorsLeft={colorsLeft} setColorsLeft={setColorsLeft} colorsLeftNow={colorsLeftNow} />
         </Grid>
       </Container>
     </main>
@@ -107,6 +75,9 @@ function App() {
 
 export default App;
 /*
+Next steps:
+- 
+
 Persistent storage:
 - reload the grid when Firestore loads
 
