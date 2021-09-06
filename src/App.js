@@ -59,7 +59,7 @@ function App() {
   
   return (
     <main>
-      <p className="title">Game Lobby</p>
+      <p className="title">Color Game Lobby</p>
       <Container maxWidth="md" id="grid">
         <Grid container spacing={5} justifyContent="center">
           <CreateBox title = 'P1' colorNum = 'color1' colorsUsed={colorsUsed} setColorsUsed={setColorsUsed} colorsUsedNow={colorsUsedNow} colorsLeft={colorsLeft} setColorsLeft={setColorsLeft} colorsLeftNow={colorsLeftNow} />
