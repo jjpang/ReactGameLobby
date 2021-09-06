@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore, collection, getDoc, doc, updateDoc, setDoc } from "firebase/firestore/lite";
+import { getFirestore, getDoc, doc, setDoc } from "firebase/firestore/lite";
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import Container from '@material-ui/core/Container';
@@ -21,11 +21,10 @@ function App() {
     appId: "1:641413523836:web:3d9424b6b039aa20d81cf9",
     measurementId: "G-7FR5CSRH8D"
   };
-  const app = initializeApp(firebaseConfig);
+  initializeApp(firebaseConfig);
   let db = getFirestore();
   
   const fetchData=async()=>{
-    console.log('fetch data')
     let docSnap = await getDoc(doc(db, "home", "colorsUsed"));
     // reads and sets colorsUsed
     setColorsUsed(docSnap.data())
