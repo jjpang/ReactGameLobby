@@ -1,3 +1,6 @@
+
+
+
 // window.onload=function(){
 //     const signUpForm = document.querySelector('#sign-up-form')
 //     if (signUpForm) {

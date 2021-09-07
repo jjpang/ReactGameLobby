@@ -56,14 +56,17 @@ export default function Modals() {
   };
 
   const signUpText = (
-    <div className={classes.paper} style={modalStyle}>
+    <div id="sign-up-modal" className={classes.paper} style={modalStyle}>
       <Avatar className={classes.avatar}>
         <LockOutlinedIcon />
       </Avatar>
       <Typography component="h1" variant="h5">
         Sign Up
       </Typography>
-      <form id="sign-up-form" className={classes.form} noValidate>
+      <form id="sign-up-form" className={classes.form} noValidate onSubmit={(e)=>{
+        e.preventDefault()
+        handleCloseSignUp()
+      }}>
         <TextField
           variant="outlined"
           margin="normal"
@@ -97,7 +100,7 @@ export default function Modals() {
           color="primary"
           className={classes.submit}
         >
-          Login
+          Sign Up
         </Button>
         <Grid container>
         </Grid>
@@ -106,14 +109,17 @@ export default function Modals() {
   );
   
   const loginText = (
-    <div id="login-form" className={classes.paper} style={modalStyle}>
+    <div className={classes.paper} style={modalStyle}>
       <Avatar className={classes.avatar}>
         <LockOutlinedIcon />
       </Avatar>
       <Typography component="h1" variant="h5">
         Login
       </Typography>
-      <form className={classes.form} noValidate>
+      <form id="login-form" className={classes.form} noValidate onSubmit={(e)=>{
+        e.preventDefault()
+        handleCloseLogin()
+      }}>
         <TextField
           variant="outlined"
           margin="normal"
@@ -167,14 +173,14 @@ export default function Modals() {
 
   return (
     <div>
-      <Button id="sign-up-button" color="inherit" onClick={handleOpenSignUp}>Sign Up</Button>
+      <Button id="sign-up-button" color="inherit" className="logged-out" display = "none" onClick={handleOpenSignUp}>Sign Up</Button>
       <Modal
         open={openSignUp}
         onClose={handleCloseSignUp}
       >
         {signUpText}
       </Modal>
-      <Button color="inherit" onClick={handleOpenLogin}>Login</Button>
+      <Button color="inherit" className="logged-out" display = "none" onClick={handleOpenLogin}>Login</Button>
       <Modal
         open={openLogin}
         onClose={handleCloseLogin}

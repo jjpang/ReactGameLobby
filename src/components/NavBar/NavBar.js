@@ -6,6 +6,7 @@ import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import Modals from './Modals/Modals'
+import Button from '@material-ui/core/Button';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -30,9 +31,9 @@ export default function NavBar() {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" className={classes.title}>
-            
           </Typography>
           <Modals />
+          <Button id="logout-button" className="logged-in" display = "none" color="inherit">Logout</Button>
         </Toolbar>
       </AppBar>
     </div>
