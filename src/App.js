@@ -5,7 +5,7 @@ Blockers
 - Uncaught error and missing dependency?
 - Display = none not working on material UI buttons
 General questions
-- Do you download NPM or use CDN typically?
+- Do you download NPM or use CDN typically? NPM install (sometimes Yarn). Look at README.
 - How to refer to files from a component?
 Old questions
 - Why does useEffect for saveData need to have both colorsUsedNow and colorsLeftNow?
@@ -23,12 +23,12 @@ import Grid from '@material-ui/core/Grid';
 import CreateBox from './components/CreateBox/CreateBox'
 import NavBar from './components/NavBar/NavBar'
 
-let auth
-
 function App() {
   const colors = ['','Red','Yellow','Green','Blue','Orange','Purple','Pink']
   const [colorsUsed, setColorsUsed] = useState({color1: '',color2: '',color3: '',color4: ''})
   const [colorsLeft, setColorsLeft] = useState(colors)
+  const [user, setUser] = useState(null)
+
   let colorsUsedNow = colorsUsed
   let colorsLeftNow = colorsLeft
   const firebaseConfig = {
@@ -41,8 +41,8 @@ function App() {
     measurementId: "G-7FR5CSRH8D"
   };
   initializeApp(firebaseConfig);
-  let db = getFirestore();
-  auth = getAuth()
+  const db = getFirestore();
+  const auth = getAuth()
   
   const fetchData=async()=>{
     let docSnap = await getDoc(doc(db, "home", "colorsUsed"));
@@ -60,17 +60,75 @@ function App() {
   
   useEffect(() => {
     fetchData()
-  },[]) // if empty only runs when component is mounted, which could happen with props changing
+  },[fetchData]) // if empty only runs when component is mounted, which could happen with props changing
   
   useEffect(() => { // updates colorsUsed in firestore
     saveData()
-  },[colorsUsedNow, colorsLeftNow])// only called upon mount, read about lifecycle hooks.
+  },[colorsUsedNow, colorsLeftNow, saveData])// only called upon mount, read about lifecycle hooks.
   
+  const handleLogout = () => {
+    signOut(auth)    
+  }
+
+
+  window.onload=function(){ // replace with useEffect
+    const loggedOutLinks = document.querySelectorAll('.logged-out')
+    const loggedInLinks = document.querySelectorAll('.logged-in')
+  
+    const setupUI = (user => { // don't need this
+      
+      if (user) {
+        console.log(loggedInLinks)
+        loggedInLinks.forEach(item => item.style.display = 'inline-flex')
+        loggedOutLinks.forEach(item => item.style.display = 'none')
+      } else {
+        loggedInLinks.forEach(item => item.style.display = 'none')
+        loggedOutLinks.forEach(item => item.style.display = 'inline-flex')
+      }
+    })
+    
+    onAuthStateChanged(auth, (user) => { // State changes for logged in and logged out
+    const loginReminder = document.querySelector('#login-reminder')  // set to false
+    if (user) {
+      console.log('user logged in: ', user)
+      loginReminder.innerHTML = ""
+      setupUI(user)
+    } else {
+      loginReminder.innerHTML = "Sign up to save colors."
+      console.log('user logged out')
+      setupUI()
+    }
+  })
+  
+    const signUpForm = document.querySelector('#sign-up-form') // Sign Up, replace with handleSignUpForm
+    console.log(signUpForm)
+    if (signUpForm) {
+        signUpForm.addEventListener('submit', (e)=>{
+            e.preventDefault()
+            const email = signUpForm['email'].value
+            const password = signUpForm['password'].value
+            createUserWithEmailAndPassword(auth, email, password).then(cred =>{
+            })
+        })
+    }
+    
+    const loginForm = document.querySelector('#login-form') // Login
+    if (loginForm) {
+      loginForm.addEventListener('submit', (e)=>{
+        e.preventDefault()
+        const email = loginForm['email'].value
+        const password = loginForm['password'].value
+        signInWithEmailAndPassword(auth, email, password).then(cred =>{
+        })
+      })
+    }
+  }
+
   return (
     <main>
-      <NavBar />
+      <NavBar handleLogout={handleLogout} user={user} setUser={setUser} />
       <p className="title">Color Game Lobby</p>
-      <Box id="login-reminder" textAlign="center" mb={5} fontSize={20} fontWeight="fontWeightBold" color="primary.main"></Box>
+      {!user && <Box id="login-reminder" textAlign="center" mb={5} fontSize={20} fontWeight="fontWeightBold" color="primary.main"></Box> }
       <Container maxWidth="md" id="grid">
         <Grid container spacing={5} justifyContent="center">
           <CreateBox title = 'P1' colorNum = 'color1' colorsUsed={colorsUsed} setColorsUsed={setColorsUsed} colorsUsedNow={colorsUsedNow} colorsLeft={colorsLeft} setColorsLeft={setColorsLeft} colorsLeftNow={colorsLeftNow} />
@@ -87,62 +145,3 @@ export default App;
 
 
 
-window.onload=function(){
-  const loggedOutLinks = document.querySelectorAll('.logged-out')
-  const loggedInLinks = document.querySelectorAll('.logged-in')
-
-  const setupUI = (user => {
-    
-    if (user) {
-      console.log(loggedInLinks)
-      loggedInLinks.forEach(item => item.style.display = 'inline-flex')
-      loggedOutLinks.forEach(item => item.style.display = 'none')
-    } else {
-      loggedInLinks.forEach(item => item.style.display = 'none')
-      loggedOutLinks.forEach(item => item.style.display = 'inline-flex')
-    }
-  })
-  
-  onAuthStateChanged(auth, (user) => { // State changes for logged in and logged out
-  const loginReminder = document.querySelector('#login-reminder')  
-  if (user) {
-    console.log('user logged in: ', user)
-    loginReminder.innerHTML = ""
-    setupUI(user)
-  } else {
-    loginReminder.innerHTML = "Sign up to save colors."
-    console.log('user logged out')
-    setupUI()
-  }
-})
-
-  const signUpForm = document.querySelector('#sign-up-form') // Sign Up
-  if (signUpForm) {
-      signUpForm.addEventListener('submit', (e)=>{
-          e.preventDefault()
-          const email = signUpForm['email'].value
-          const password = signUpForm['password'].value
-          createUserWithEmailAndPassword(auth, email, password).then(cred =>{
-          })
-      })
-  }
-  const logoutButton = document.querySelector('#logout-button') // Logout
-  if (logoutButton) {
-    logoutButton.addEventListener('click', (e)=>{
-      e.preventDefault()
-      signOut(auth).then(()=>{
-      })
-    })
-  }
-
-  const loginForm = document.querySelector('#login-form') // Login
-  if (loginForm) {
-    loginForm.addEventListener('submit', (e)=>{
-      e.preventDefault()
-      const email = loginForm['email'].value
-      const password = loginForm['password'].value
-      signInWithEmailAndPassword(auth, email, password).then(cred =>{
-      })
-    })
-  }
-}

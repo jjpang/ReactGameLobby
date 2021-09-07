@@ -20,7 +20,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function NavBar() {
+export default function NavBar({handleLogout, user}) {
   const classes = useStyles();
 
   return (
@@ -32,8 +32,8 @@ export default function NavBar() {
           </IconButton>
           <Typography variant="h6" className={classes.title}>
           </Typography>
-          <Modals />
-          <Button id="logout-button" className="logged-in" display = "none" color="inherit">Logout</Button>
+          { showModals && <Modals />}
+          {!user && <Button id="logout-button" className="logged-in" display = "none" color="inherit" onClick={handleLogout}>Logout</Button>}
         </Toolbar>
       </AppBar>
     </div>
